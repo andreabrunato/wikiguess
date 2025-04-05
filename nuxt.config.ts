@@ -13,6 +13,7 @@ export default defineNuxtConfig({
   },
   modules: [
     '@nuxtjs/i18n',
+    '@nuxtjs/tailwindcss',
     // ...other modules...
   ],
   i18n: {
