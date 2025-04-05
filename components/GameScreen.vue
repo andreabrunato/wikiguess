@@ -9,8 +9,8 @@
       <p v-if="gameStarted && !loading && !result">⏱️ {{ timer.toFixed(2) }}s</p>
       <img v-if="imageUrl" :src="imageUrl" alt="" />
       <p>{{ snippet }}</p>
-      <div class="guesses">
-        <button v-for="option in options" :key="option" @click="$emit('checkGuess', option)">
+      <div class="guesses grid grid-cols-2 gap-4">
+        <button v-for="option in options" :key="option" class="btn btn-primary" @click="$emit('checkGuess', option)">
           {{ option.replace(/_/g, ' ') }}
         </button>
       </div>
@@ -22,9 +22,9 @@
       <p v-if="timer <= 10 && result === t('correct')">Bonus tempo: +{{ Math.max(0, 10000 - Math.round(timer * 1000)) }}</p>
       <p v-if="result !== t('correct')">-2000 {{ t('points') }}</p>
     </div>
-    <button v-if="result && round < (roundTotal + 1)" @click="$emit('nextRound')">{{ t('nextRound') }}</button>
-    <button v-if="round === (roundTotal + 1)" @click="$emit('newGame')">{{ t('newGame') }}</button>
-    <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown && timer >= 5" @click="$emit('buyImage')">{{ t('buyImage') }}</button>
+    <button class="btn btn-primary" v-if="result && round < (roundTotal + 1)" @click="$emit('nextRound')">{{ t('nextRound') }}</button>
+    <button class="btn btn-primary" v-if="round === (roundTotal + 1)" @click="$emit('newGame')">{{ t('newGame') }}</button>
+    <button class="btn btn-success" v-if="!result && round < (roundTotal + 1) && !loading && !imageShown && timer >= 5" @click="$emit('buyImage')">{{ t('buyImage') }}</button>
   </div>
 </template>
 

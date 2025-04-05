@@ -286,3 +286,9 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.game {
+  padding: 20px;
+}
+</style>
