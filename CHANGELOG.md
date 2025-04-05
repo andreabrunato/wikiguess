@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.0] - 2025-04-05
+
+### Added
+
+- First complete UI overhaul.
+- Integration of Tailwind CSS and DaisyUI for improved styling and responsiveness.
+
+### Miscellaneous
+
+- Updated changelog and README.
+
 ## [0.0.3] - 2025-04-05
 
 ### Added
