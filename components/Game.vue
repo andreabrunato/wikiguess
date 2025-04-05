@@ -66,22 +66,11 @@ export default {
     async fetchRandomPageData() {
       this.loading = true;
       try {
-        // Fetch a random page summary
-        const randomPageResponse = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/random/summary`);
-        const randomPageData = await randomPageResponse.json();
+        const randomPageData = await fetchRandomPage(this.language);
         this.correctTitle = randomPageData.title;
         this.snippet = this.replaceTitleWords(randomPageData.extract, this.correctTitle);
 
-        // Fetch additional random pages to replace related pages
-        const randomPages = [];
-        for (let i = 0; i < 3; i++) {
-          const randomPageResponse = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/random/summary`);
-          const randomPageData = await randomPageResponse.json();
-          randomPages.push({ title: randomPageData.title });
-        }
-
-        this.relatedPages = randomPages;
-
+        this.relatedPages = await fetchRelatedPages(this.language);
         this.createOptions();
       } catch (error) {
         console.error('Errore nel recupero della pagina Wikipedia:', error);
@@ -116,7 +105,8 @@ export default {
       return snippet;
     },
     checkGuess(option) {
-      if (option === this.correctTitle) {
+      const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
+      if (option === sanitizedCorrectTitle) {
         this.result = 'Corretto!';
         this.score += 1000;
       } else {
