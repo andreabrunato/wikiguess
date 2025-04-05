@@ -5,7 +5,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   target: 'static', // Imposta la modalità statica
   router: {
-    base: '/wikiguess/' // Base path per GitHub Pages
+    base: '/wikiguess/' // Imposta il percorso base corretto per GitHub Pages
   },
   generate: {
     routes: ['/', '/about'] // Sostituisce fallback con una configurazione valida
