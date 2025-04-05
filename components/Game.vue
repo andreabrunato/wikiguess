@@ -1,11 +1,15 @@
 <template>
-  <div class="the-game">
+  <div class="the-game flex flex-col items-center space-y-6">
     <StartScreen
       v-if="!gameStarted"
       :language="language"
       @updateLanguage="updateLanguage"
       @startGame="newGame"
     />
+    <div v-else-if="loading" class="loading-screen flex flex-col items-center justify-center h-screen">
+      <div class="loader border-t-4 border-primary rounded-full w-16 h-16 animate-spin"></div>
+      <p class="mt-4 text-lg font-bold">{{ t('loading') }}</p>
+    </div>
     <GameScreen
       v-else-if="gameStarted && round <= roundTotal"
       :round="round"
@@ -28,6 +32,7 @@
       :score="score"
       :results="results"
       @newGame="newGame"
+      @restartGame="newGame"
     />
   </div>
 </template>
@@ -288,7 +293,11 @@ export default {
 </script>
 
 <style scoped>
-.game {
-  padding: 20px;
+/* Rimosso il CSS non necessario, ora utilizza solo classi di daisyUI */
+.loader {
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent;
+  border-top-color: var(--tw-border-opacity, theme('colors.primary'));
 }
 </style>

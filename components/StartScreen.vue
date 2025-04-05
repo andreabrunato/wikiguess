@@ -1,10 +1,10 @@
 <template>
-  <div class="start-screen card shadow-xl p-6">
-    <div class="language-selector form-control mb-4">
+  <div class="start-screen flex flex-col items-center space-y-6">
+    <div class="language-selector form-control w-full max-w-xs">
       <label for="language" class="label">
         <span class="label-text">LANGUAGE:</span>
       </label>
-      <select id="language" class="select select-bordered" :value="language" @change="$emit('update:language', $event.target.value)">
+      <select id="language" class="select select-bordered w-full" :value="language" @change="$emit('update:language', $event.target.value)">
         <option value="it">🤌 Italiano</option>
         <option value="en">🇬🇧 English</option>
       </select>
@@ -26,8 +26,5 @@ export default {
 </script>
 
 <style scoped>
-.start-screen {
-  max-width: 600px;
-  margin: 40px auto;
-}
+/* Rimosso il CSS non necessario, ora utilizza solo classi di daisyUI */
 </style>

@@ -13,5 +13,7 @@
   "timeTaken": "Time Taken",
   "timeBonus": "Time Bonus",
   "pointsEarned": "Points Earned",
-  "buyImage": "Buy Image for 500 points"
+  "buyImage": "Buy Image for 500 points",
+  "gameOver": "Game Over",
+  "playAgain": "Play Again"
 }
