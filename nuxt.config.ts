@@ -3,10 +3,9 @@ import { resolve } from 'path';
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  target: 'static', // Imposta la modalità statica
   router: {
-    options: {
-      // Rimuovo la proprietà `base` non valida
-    }
+    base: '/wikiguess/' // Base path per GitHub Pages
   },
   generate: {
     routes: ['/', '/about'] // Sostituisce fallback con una configurazione valida
