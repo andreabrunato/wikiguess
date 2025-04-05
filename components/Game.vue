@@ -16,14 +16,23 @@
         <p>{{ t('score') }}: {{ score }}</p>
       </div>
       <p v-if="loading">🔃 {{ t('loading') }}</p>
-      <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
-      <p>{{ snippet }}</p>
-      <div class="guesses" v-if="options.length && !loading && !result">
-        <button v-for="option in options" :key="option" @click="checkGuess(option)">
-          {{ option.replace(/_/g, ' ') }}
-        </button>
+      <div v-if="gameStarted && !loading && !result && options.length">
+        <p v-if="gameStarted && !loading && !result">⏱️ {{ timer.toFixed(2) }}s</p>
+        <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
+        <p>{{ snippet }}</p>
+        <div class="guesses">
+          <button v-for="option in options" :key="option" @click="checkGuess(option)">
+            {{ option.replace(/_/g, ' ') }}
+          </button>
+        </div>
       </div>
       <p v-if="result">{{ result }}</p>
+      <p v-if="result && timer > 0">⏱️ Tempo impiegato: {{ timer.toFixed(2) }}s</p>
+      <div v-if="result">
+        <p v-if="result === t('correct')">+1000 {{ t('points') }}</p>
+        <p v-if="timer <= 10 && result === t('correct')">Bonus tempo: +{{ Math.max(0, 10000 - Math.round(timer * 1000)) }}</p>
+        <p v-if="result !== t('correct')">-2000 {{ t('points') }}</p>
+      </div>
       <button v-if="result && round < (roundTotal + 1)" @click="nextRound">{{ t('nextRound') }}</button>
       <button v-if="round === (roundTotal + 1)" @click="newGame">{{ t('newGame') }}</button>
       <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ t('showImage') }}</button>
@@ -55,12 +64,15 @@ export default {
       round: 0,
       roundTotal: 10,
       imageShown: false,
-      language: 'it' // Default language
+      language: 'it', // Default language
+      timer: 0,
+      timerInterval: null,
     };
   },
   methods: {
     async fetchRandomPageData() {
       this.loading = true;
+      this.stopTimer(); // Stop any previous timer
       try {
         const randomPageData = await fetchRandomPage(this.language);
         this.correctTitle = randomPageData.title;
@@ -72,6 +84,9 @@ export default {
         console.error('Errore nel recupero della pagina Wikipedia:', error);
       } finally {
         this.loading = false;
+        if (this.options.length) {
+          this.startTimer(); // Start the timer when data is ready
+        }
       }
     },
     createOptions() {
@@ -100,10 +115,17 @@ export default {
       return snippet;
     },
     checkGuess(option) {
+      this.stopTimer();
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       if (option === sanitizedCorrectTitle) {
         this.result = this.t('correct');
         this.score += 1000;
+
+        // Calcolo del bonus se la risposta è entro 10 secondi
+        if (this.timer <= 10) {
+          const bonus = Math.max(0, 10000 - Math.round(this.timer * 1000));
+          this.score += bonus;
+        }
       } else {
         this.result = `${this.t('wrong')} ${this.correctTitle}`;
         this.score -= 2000;
@@ -124,6 +146,7 @@ export default {
       }
     },
     newGame() {
+      this.stopTimer();
       this.snippet = '';
       this.correctTitle = '';
       this.result = '';
@@ -138,6 +161,7 @@ export default {
       this.fetchRandomPageData();
     },
     nextRound() {
+      this.stopTimer();
       this.snippet = '';
       this.correctTitle = '';
       this.result = '';
@@ -153,6 +177,21 @@ export default {
     },
     updateLanguage() {
       this.locale = this.language; // Assegna direttamente la lingua selezionata
+    },
+    startTimer() {
+      this.timer = 0;
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+      }
+      this.timerInterval = setInterval(() => {
+        this.timer += 0.01;
+      }, 10);
+    },
+    stopTimer() {
+      if (this.timerInterval) {
+        clearInterval(this.timerInterval);
+        this.timerInterval = null;
+      }
     }
   }
 };
