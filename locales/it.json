@@ -13,5 +13,7 @@
   "timeTaken": "Tempo impiegato",
   "timeBonus": "Bonus tempo",
   "pointsEarned": "Punti ottenuti",
-  "buyImage": "Compra immagine per 500 punti"
+  "buyImage": "Compra immagine per 500 punti",
+  "gameOver": "Fine del gioco",
+  "playAgain": "Gioca di nuovo"
 }

@@ -1,13 +1,15 @@
 <template>
-  <div class="start-screen">
-    <div class="language-selector">
-      <label for="language">LANGUAGE:</label>
-      <select id="language" :value="language" @change="$emit('update:language', $event.target.value)">
+  <div class="start-screen flex flex-col items-center space-y-6">
+    <div class="language-selector form-control w-full max-w-xs">
+      <label for="language" class="label">
+        <span class="label-text">LANGUAGE:</span>
+      </label>
+      <select id="language" class="select select-bordered w-full" :value="language" @change="$emit('update:language', $event.target.value)">
         <option value="it">🤌 Italiano</option>
         <option value="en">🇬🇧 English</option>
       </select>
     </div>
-    <button @click="$emit('startGame')">{{ t('newGame') }}</button>
+    <button class="btn btn-primary w-full" @click="$emit('startGame')">{{ t('newGame') }}</button>
   </div>
 </template>
 
@@ -24,15 +26,5 @@ export default {
 </script>
 
 <style scoped>
-.start-screen {
-  text-align: center;
-  font-family: sans-serif;
-  font-size: 2rem;
-  border: 3px solid #000;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px;
-  max-width: 1200px;
-  margin: 40px auto;
-}
+/* Rimosso il CSS non necessario, ora utilizza solo classi di daisyUI */
 </style>
