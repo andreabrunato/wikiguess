@@ -7,5 +7,10 @@
   "wrong": "Wrong! The correct answer was: ",
   "nextRound": "Next Round",
   "showImage": "Show Image",
-  "randomAnswer": "Random Answer"
+  "randomAnswer": "Random Answer",
+  "finalScore": "Final Score",
+  "questionText": "Question Text",
+  "timeTaken": "Time Taken",
+  "timeBonus": "Time Bonus",
+  "pointsEarned": "Points Earned"
 }

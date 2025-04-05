@@ -15,7 +15,7 @@
         <p v-if="round < (roundTotal + 1)">{{ t('round') }}: {{ round }}/{{roundTotal}}</p>
         <p>{{ t('score') }}: {{ score }}</p>
       </div>
-      <p v-if="loading">🔃 {{ t('loading') }} ({{ loadingProgress }}%)</p>
+      <p v-if="loading">🔃 {{ t('loading') }}</p>
       <div v-if="gameStarted && !loading && !result && options.length">
         <p v-if="gameStarted && !loading && !result">⏱️ {{ timer.toFixed(2) }}s</p>
         <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
@@ -37,12 +37,34 @@
       <button v-if="round === (roundTotal + 1)" @click="newGame">{{ t('newGame') }}</button>
       <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ t('showImage') }}</button>
     </div>
+    <div v-if="round === (roundTotal + 1)">
+      <h1>{{ t('finalScore') }}: {{ score }}</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>{{ t('questionText') }}</th>
+            <th>{{ t('timeTaken') }}</th>
+            <th>{{ t('timeBonus') }}</th>
+            <th>{{ t('pointsEarned') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(result, index) in results" :key="index">
+            <td>{{ result.question }}</td>
+            <td>{{ result.time.toFixed(2) }}s</td>
+            <td>{{ result.bonus }}</td>
+            <td>{{ result.points }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <button @click="newGame">{{ t('newGame') }}</button>
+    </div>
   </div>
 </template>
 
 <script>
 import { useI18n } from 'vue-i18n';
-import { fetchRandomPage, fetchRelatedPages } from '../utils/api';
+import { fetchRandomPage, fetchRelatedPages, fetchRandomPagesBatch } from '../utils/api';
 
 export default {
   setup() {
@@ -67,8 +89,8 @@ export default {
       language: 'it', // Default language
       timer: 0,
       timerInterval: null,
-      loadingProgress: 0, // Inizializza la percentuale di caricamento
       preloadedQuestions: [], // Array per memorizzare le domande precaricate
+      results: [] // Array per memorizzare i risultati di ogni domanda
     };
   },
   methods: {
@@ -125,19 +147,32 @@ export default {
     checkGuess(option) {
       this.stopTimer();
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
+      let points = 0;
+      let bonus = 0;
+
       if (option === sanitizedCorrectTitle) {
         this.result = this.t('correct');
-        this.score += 1000;
+        points = 1000;
 
         // Calcolo del bonus se la risposta è entro 10 secondi
         if (this.timer <= 10) {
-          const bonus = Math.max(0, 10000 - Math.round(this.timer * 1000));
-          this.score += bonus;
+          bonus = Math.max(0, 10000 - Math.round(this.timer * 1000));
+          points += bonus;
         }
       } else {
         this.result = `${this.t('wrong')} ${this.correctTitle}`;
-        this.score -= 2000;
+        points = -2000;
       }
+
+      this.score += points;
+
+      // Salva i risultati della domanda corrente
+      this.results.push({
+        question: this.correctTitle.replace(/\*{3}/g, ''), // Rimuove gli asterischi
+        time: this.timer,
+        bonus,
+        points
+      });
     },
     async showImage() {
       this.loading = true;
@@ -167,21 +202,39 @@ export default {
       this.gameStarted = true;
       this.imageShown = false;
       this.loading = true; // Mostra il loading finché non sono precaricate tutte le domande
-      this.loadingProgress = 0; // Inizializza la percentuale di caricamento
       this.preloadedQuestions = []; // Array per memorizzare le domande precaricate
+      this.results = []; // Resetta i risultati
 
       try {
-        // Precarica tutte le domande per tutti i round
-        for (let i = 0; i < this.roundTotal; i++) {
-          const questionData = await this.fetchRandomPageData();
-          this.preloadedQuestions.push(questionData);
-          this.loadingProgress = Math.round(((i + 1) / this.roundTotal) * 100); // Aggiorna la percentuale di caricamento
-        }
+        // Precarica tutte le domande in batch
+        const questions = await fetchRandomPagesBatch(this.language, this.roundTotal);
+        this.preloadedQuestions = await Promise.all(
+          questions.map(async ({ title, extract }) => {
+            const relatedPages = await fetchRelatedPages(this.language);
+            const sanitizedCorrectTitle = title.replace(/\s*\([^)]*\)/g, '');
+            const relatedTitles = relatedPages
+              .map(page => page.title?.replace(/\s*\([^)]*\)/g, '') || '')
+              .filter(Boolean);
+
+            const options = [sanitizedCorrectTitle, ...relatedTitles];
+
+            while (options.length < 4) {
+              options.push(this.t('randomAnswer') + ` ${options.length + 1}`);
+            }
+
+            return {
+              correctTitle: title,
+              snippet: this.replaceTitleWords(extract, title),
+              relatedPages,
+              options: this.shuffleArray(options),
+            };
+          })
+        );
+
       } catch (error) {
         console.error('Errore durante la precarica delle domande:', error);
       } finally {
         this.loading = false; // Nasconde il loading una volta completata la precarica
-        this.loadingProgress = 0; // Resetta la percentuale di caricamento
       }
 
       // Imposta la prima domanda

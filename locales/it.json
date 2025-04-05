@@ -7,5 +7,10 @@
   "wrong": "Sbagliato! La risposta corretta era: ",
   "nextRound": "Prossimo round",
   "showImage": "Mostra immagine",
-  "randomAnswer": "Risposta casuale"
+  "randomAnswer": "Risposta casuale",
+  "finalScore": "Punteggio finale",
+  "questionText": "Testo della domanda",
+  "timeTaken": "Tempo impiegato",
+  "timeBonus": "Bonus tempo",
+  "pointsEarned": "Punti ottenuti"
 }

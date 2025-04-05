@@ -21,3 +21,17 @@ export async function fetchRelatedPages(language: string) {
   const results = await Promise.all(requests);
   return results.map(({ title }) => ({ title }));
 }
+
+export async function fetchRandomPagesBatch(language: string, count: number) {
+  const requests = Array.from({ length: count }, () => 
+    fetch(`https://${language}.wikipedia.org/api/rest_v1/page/random/summary`).then(response => {
+      if (!response.ok) {
+        throw new Error('Errore nel recupero delle pagine casuali in batch');
+      }
+      return response.json();
+    })
+  );
+
+  const results = await Promise.all(requests);
+  return results.map(({ title, extract }) => ({ title, extract }));
+}
