@@ -1,75 +1,50 @@
-# Nuxt Minimal Starter
+# WikiGuess
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+**Note**: This project is an experimental prototype and is still under development. Features and functionality may change as the project evolves.
 
-## Setup
+WikiGuess is a fun and interactive game where players guess answers based on Wikipedia content. The game is designed to be engaging and educational, offering a unique way to explore knowledge.
 
-Make sure to install dependencies:
+## Features
+
+- **Game Over Screen**: Displays scores at the end of the game.
+- **Preloaded Questions**: Ensures smooth gameplay by preloading questions.
+- **Time Bonus**: Rewards players for quick answers.
+- **Localized Content**: Supports multiple languages (e.g., English and Italian).
+
+## Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/andreabrunato/wikiguess.git
+   ```
+
+2. Navigate to the project directory:
+
+   ```bash
+   cd wikiguess
+   ```
+
+3. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+## Usage
+
+Start the development server:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
 npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
+Open your browser and navigate to `http://localhost:3000` to play the game.
 
-Build the application for production:
+## Contributing
 
-```bash
-# npm
-npm run build
+Contributions are welcome! Please fork the repository and submit a pull request.
 
-# pnpm
-pnpm build
+## License
 
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+This project is licensed under the MIT License. See the LICENSE file for details.
