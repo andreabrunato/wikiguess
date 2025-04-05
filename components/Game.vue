@@ -8,15 +8,15 @@
           <option value="en">🇬🇧 English</option>
         </select>
       </div>
-      <button @click="newGame">{{ labels.newGame }}</button>
+      <button @click="newGame">{{ t('newGame') }}</button>
     </div>
     <div v-else>
       <div class="scores">
-        <p v-if="round < (roundTotal + 1)">{{ labels.round }}: {{ round }}/{{roundTotal}}</p>
-        <p>{{ labels.score }}: {{ score }}</p>
+        <p v-if="round < (roundTotal + 1)">{{ t('round') }}: {{ round }}/{{roundTotal}}</p>
+        <p>{{ t('score') }}: {{ score }}</p>
       </div>
-      <p v-if="loading">🔃 {{ labels.loading }}</p>
-      <img v-if="imageUrl" :src="imageUrl" :alt="labels.imageAlt" />
+      <p v-if="loading">🔃 {{ t('loading') }}</p>
+      <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
       <p>{{ snippet }}</p>
       <div class="guesses" v-if="options.length && !loading && !result">
         <button v-for="option in options" :key="option" @click="checkGuess(option)">
@@ -24,17 +24,22 @@
         </button>
       </div>
       <p v-if="result">{{ result }}</p>
-      <button v-if="result && round < (roundTotal + 1)" @click="nextRound">{{ labels.nextRound }}</button>
-      <button v-if="round === (roundTotal + 1)" @click="newGame">{{ labels.newGame }}</button>
-      <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ labels.showImage }}</button>
+      <button v-if="result && round < (roundTotal + 1)" @click="nextRound">{{ t('nextRound') }}</button>
+      <button v-if="round === (roundTotal + 1)" @click="newGame">{{ t('newGame') }}</button>
+      <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ t('showImage') }}</button>
     </div>
   </div>
 </template>
 
 <script>
+import { useI18n } from 'vue-i18n';
 import { fetchRandomPage, fetchRelatedPages } from '../utils/api';
 
 export default {
+  setup() {
+    const { t, locale } = useI18n();
+    return { t, locale };
+  },
   data() {
     return {
       snippet: '',
@@ -50,16 +55,7 @@ export default {
       round: 0,
       roundTotal: 10,
       imageShown: false,
-      language: 'it', // Default language
-      labels: {
-        newGame: 'Nuova partita',
-        nextRound: 'Prossimo round',
-        showImage: 'Mostra immagine',
-        round: 'Round',
-        score: 'Punteggio',
-        loading: 'Caricamento in corso...',
-        imageAlt: 'Immagine da Wikipedia'
-      }
+      language: 'it' // Default language
     };
   },
   methods: {
@@ -79,23 +75,22 @@ export default {
       }
     },
     createOptions() {
+      const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       const relatedTitles = this.relatedPages
-        .map(page => (page.title ? page.title.replace(/\s*\([^)]*\)/g, '') : ''))
-        .filter(title => title); // Filtra eventuali stringhe vuote
-      this.options = [this.correctTitle.replace(/\s*\([^)]*\)/g, ''), ...relatedTitles];
+        .map(page => page.title?.replace(/\s*\([^)]*\)/g, '') || '')
+        .filter(Boolean);
+
+      this.options = [sanitizedCorrectTitle, ...relatedTitles];
 
       while (this.options.length < 4) {
-        this.options.push(`Risposta casuale ${this.options.length + 1}`);
+        this.options.push(this.t('randomAnswer') + ` ${this.options.length + 1}`);
       }
 
       this.options = this.shuffleArray(this.options);
     },
+
     shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
+      return array.sort(() => Math.random() - 0.5);
     },
     replaceTitleWords(snippet, title) {
       const titleWords = title.split(' ');
@@ -107,10 +102,10 @@ export default {
     checkGuess(option) {
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       if (option === sanitizedCorrectTitle) {
-        this.result = 'Corretto!';
+        this.result = this.t('correct');
         this.score += 1000;
       } else {
-        this.result = `Sbagliato! La risposta corretta era: ${this.correctTitle}`;
+        this.result = `${this.t('wrong')} ${this.correctTitle}`;
         this.score -= 2000;
       }
     },
@@ -157,27 +152,7 @@ export default {
       }
     },
     updateLanguage() {
-      if (this.language === 'it') {
-        this.labels = {
-          newGame: 'Nuova partita',
-          nextRound: 'Prossimo round',
-          showImage: 'Mostra immagine',
-          round: 'Round',
-          score: 'Punteggio',
-          loading: 'Caricamento in corso...',
-          imageAlt: 'Immagine da Wikipedia'
-        };
-      } else if (this.language === 'en') {
-        this.labels = {
-          newGame: 'New Game',
-          nextRound: 'Next Round',
-          showImage: 'Show Image',
-          round: 'Round',
-          score: 'Score',
-          loading: 'Loading...',
-          imageAlt: 'Image from Wikipedia'
-        };
-      }
+      this.locale = this.language; // Assegna direttamente la lingua selezionata
     }
   }
 };

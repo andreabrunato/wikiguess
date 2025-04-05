@@ -1,13 +1,15 @@
-// filepath: /c:/Users/andre/OneDrive/Desktop/dev/wikiguess/wikiguess/nuxt.config.ts
+import { resolve } from 'path';
+
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
-  target: 'static',
   router: {
-    base: '/wikiguess/'
+    options: {
+      // Rimuovo la proprietà `base` non valida
+    }
   },
   generate: {
-    fallback: true
+    routes: ['/', '/about'] // Sostituisce fallback con una configurazione valida
   },
   modules: [
     '@nuxtjs/i18n',
@@ -19,6 +21,9 @@ export default defineNuxtConfig({
       { code: 'it', name: 'Italiano' }
     ],
     defaultLocale: 'en',
-    vueI18n: './i18n.config.ts' // Usa un file separato per la configurazione di i18n
+    vueI18n: resolve('./i18n.config.ts'), // Corregge l'uso di resolve
+    bundle: {
+      optimizeTranslationDirective: false // Disabilita la funzione per evitare il warning
+    }
   }
 })
