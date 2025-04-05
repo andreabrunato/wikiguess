@@ -1,0 +1,11 @@
+{
+  "newGame": "Nuova partita",
+  "loading": "Caricamento in corso...",
+  "round": "Round",
+  "score": "Punteggio",
+  "correct": "Corretto!",
+  "wrong": "Sbagliato! La risposta corretta era: ",
+  "nextRound": "Prossimo round",
+  "showImage": "Mostra immagine",
+  "randomAnswer": "Risposta casuale"
+}

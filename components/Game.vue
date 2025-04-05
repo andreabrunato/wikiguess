@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { fetchRandomPage, fetchRelatedPages } from '../utils/api';
+
 export default {
   data() {
     return {
@@ -39,17 +41,28 @@ export default {
       round: 0,
       roundTotal: 10,
       imageShown: false
-    }
+    };
   },
   methods: {
-    async fetchRandomPage() {
+    async fetchRandomPageData() {
       this.loading = true;
       try {
-        const response = await fetch('https://it.wikipedia.org/api/rest_v1/page/random/summary');
-        const data = await response.json();
-        this.correctTitle = data.title;
-        this.snippet = this.replaceTitleWords(data.extract, this.correctTitle);
-        await this.fetchRelatedPages();
+        // Fetch a random page summary
+        const randomPageResponse = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+        const randomPageData = await randomPageResponse.json();
+        this.correctTitle = randomPageData.title;
+        this.snippet = this.replaceTitleWords(randomPageData.extract, this.correctTitle);
+
+        // Fetch additional random pages to replace related pages
+        const randomPages = [];
+        for (let i = 0; i < 3; i++) {
+          const randomPageResponse = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+          const randomPageData = await randomPageResponse.json();
+          randomPages.push({ title: randomPageData.title });
+        }
+
+        this.relatedPages = randomPages;
+
         this.createOptions();
       } catch (error) {
         console.error('Errore nel recupero della pagina Wikipedia:', error);
@@ -57,21 +70,16 @@ export default {
         this.loading = false;
       }
     },
-    async fetchRelatedPages() {
-      try {
-        const response = await fetch(`https://it.wikipedia.org/api/rest_v1/page/related/${this.correctTitle}`);
-        const data = await response.json();
-        this.relatedPages = this.getRandomElements(data.pages, 3);
-      } catch (error) {
-        console.error('Errore nel recupero delle pagine correlate:', error);
-      }
-    },
-    getRandomElements(array, count) {
-      const shuffled = array.sort(() => 0.5 - Math.random());
-      return shuffled.slice(0, count);
-    },
     createOptions() {
-      this.options = [this.correctTitle, ...this.relatedPages.map(page => page.title)];
+      const relatedTitles = this.relatedPages
+        .map(page => (page.title ? page.title.replace(/\s*\([^)]*\)/g, '') : ''))
+        .filter(title => title); // Filtra eventuali stringhe vuote
+      this.options = [this.correctTitle.replace(/\s*\([^)]*\)/g, ''), ...relatedTitles];
+
+      while (this.options.length < 4) {
+        this.options.push(`Risposta casuale ${this.options.length + 1}`);
+      }
+
       this.options = this.shuffleArray(this.options);
     },
     shuffleArray(array) {
@@ -85,7 +93,6 @@ export default {
       const titleWords = title.split(' ');
       const regex = new RegExp(`\\b(${titleWords.join('|')})\\b`, 'gi');
       snippet = snippet.replace(regex, '***');
-      // Rimuovi duplicati consecutivi di ***
       snippet = snippet.replace(/\*{3}(\s+\*{3})+/g, '***');
       return snippet;
     },
@@ -124,7 +131,7 @@ export default {
       this.round = 1;
       this.gameStarted = true;
       this.imageShown = false;
-      this.fetchRandomPage();
+      this.fetchRandomPageData();
     },
     nextRound() {
       this.snippet = '';
@@ -137,11 +144,11 @@ export default {
       this.round++;
       this.imageShown = false;
       if (this.round < (this.roundTotal + 1)) {
-        this.fetchRandomPage();
+        this.fetchRandomPageData();
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>
