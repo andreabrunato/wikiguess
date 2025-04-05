@@ -15,7 +15,7 @@
         <p v-if="round < (roundTotal + 1)">{{ t('round') }}: {{ round }}/{{roundTotal}}</p>
         <p>{{ t('score') }}: {{ score }}</p>
       </div>
-      <p v-if="loading">🔃 {{ t('loading') }}</p>
+      <p v-if="loading">🔃 {{ t('loading') }} ({{ loadingProgress }}%)</p>
       <div v-if="gameStarted && !loading && !result && options.length">
         <p v-if="gameStarted && !loading && !result">⏱️ {{ timer.toFixed(2) }}s</p>
         <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
@@ -67,6 +67,8 @@ export default {
       language: 'it', // Default language
       timer: 0,
       timerInterval: null,
+      loadingProgress: 0, // Inizializza la percentuale di caricamento
+      preloadedQuestions: [], // Array per memorizzare le domande precaricate
     };
   },
   methods: {
@@ -80,6 +82,12 @@ export default {
 
         this.relatedPages = await fetchRelatedPages(this.language);
         this.createOptions();
+        return {
+          correctTitle: this.correctTitle,
+          snippet: this.snippet,
+          relatedPages: this.relatedPages,
+          options: this.options,
+        };
       } catch (error) {
         console.error('Errore nel recupero della pagina Wikipedia:', error);
       } finally {
@@ -145,7 +153,7 @@ export default {
         this.loading = false;
       }
     },
-    newGame() {
+    async newGame() {
       this.stopTimer();
       this.snippet = '';
       this.correctTitle = '';
@@ -158,8 +166,39 @@ export default {
       this.round = 1;
       this.gameStarted = true;
       this.imageShown = false;
-      this.fetchRandomPageData();
+      this.loading = true; // Mostra il loading finché non sono precaricate tutte le domande
+      this.loadingProgress = 0; // Inizializza la percentuale di caricamento
+      this.preloadedQuestions = []; // Array per memorizzare le domande precaricate
+
+      try {
+        // Precarica tutte le domande per tutti i round
+        for (let i = 0; i < this.roundTotal; i++) {
+          const questionData = await this.fetchRandomPageData();
+          this.preloadedQuestions.push(questionData);
+          this.loadingProgress = Math.round(((i + 1) / this.roundTotal) * 100); // Aggiorna la percentuale di caricamento
+        }
+      } catch (error) {
+        console.error('Errore durante la precarica delle domande:', error);
+      } finally {
+        this.loading = false; // Nasconde il loading una volta completata la precarica
+        this.loadingProgress = 0; // Resetta la percentuale di caricamento
+      }
+
+      // Imposta la prima domanda
+      this.setQuestion(0);
     },
+
+    setQuestion(index) {
+      const question = this.preloadedQuestions[index];
+      if (question) {
+        this.correctTitle = question.correctTitle;
+        this.snippet = question.snippet;
+        this.relatedPages = question.relatedPages;
+        this.options = question.options;
+        this.startTimer(); // Azzerare e riavviare il timer per ogni nuova domanda
+      }
+    },
+
     nextRound() {
       this.stopTimer();
       this.snippet = '';
@@ -172,7 +211,7 @@ export default {
       this.round++;
       this.imageShown = false;
       if (this.round < (this.roundTotal + 1)) {
-        this.fetchRandomPageData();
+        this.setQuestion(this.round - 1); // Usa la domanda precaricata per il round successivo
       }
     },
     updateLanguage() {
