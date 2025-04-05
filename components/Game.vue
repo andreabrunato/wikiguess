@@ -1,5 +1,5 @@
 <template>
-  <div class="the-game flex flex-col items-center space-y-6">
+  <div class="the-game w-full flex flex-col items-center space-y-6">
     <StartScreen
       v-if="!gameStarted"
       :language="language"

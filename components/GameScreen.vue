@@ -1,5 +1,5 @@
 <template>
-  <div class="game-screen w-100 flex flex-col items-center space-y-6">
+  <div class="game-screen w-full flex flex-col items-center space-y-6">
     <!-- Header Section -->
     <div class="header w-full flex justify-between items-center p-4 bg-primary text-primary-content rounded-lg">
       <p>{{ t('round') }}: {{ round }}/{{ roundTotal }}</p>

@@ -1,5 +1,5 @@
 <template>
-  <div class="final-screen flex flex-col items-center space-y-6">
+  <div class="final-screen w-full flex flex-col items-center space-y-6">
     <h1 class="text-3xl font-bold">{{ t('gameOver') }}</h1>
     <div class="score text-2xl font-bold" :class="{'text-error': score < 0, 'text-success': score >= 0}">
       {{ t('finalScore') }}: {{ score }}
@@ -29,7 +29,7 @@
       </table>
     </div>
 
-    <button class="btn btn-primary w-full" @click="$emit('restartGame')">{{ t('playAgain') }}</button>
+    <button class="btn btn-primary" @click="$emit('restartGame')">{{ t('playAgain') }}</button>
   </div>
 </template>
 

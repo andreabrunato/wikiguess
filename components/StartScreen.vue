@@ -9,7 +9,7 @@
         <option value="en">🇬🇧 English</option>
       </select>
     </div>
-    <button class="btn btn-primary w-full" @click="$emit('startGame')">{{ t('newGame') }}</button>
+    <button class="btn btn-primary" @click="$emit('startGame')">{{ t('newGame') }}</button>
   </div>
 </template>
 
