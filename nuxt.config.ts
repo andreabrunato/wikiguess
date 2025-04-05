@@ -4,6 +4,9 @@ export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   target: 'static', // Imposta la modalità statica
+  app: {
+    baseURL: '/wikiguess/' // Forza il percorso base per tutte le risorse
+  },
   router: {
     base: '/wikiguess/' // Imposta il percorso base corretto per GitHub Pages
   },
