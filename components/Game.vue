@@ -1,13 +1,22 @@
 <template>
   <div class="the-game">
-    <button v-if="!gameStarted" @click="newGame">Nuova partita</button>
+    <div v-if="!gameStarted">
+      <div class="language-selector">
+        <label for="language">LANGUAGE:</label>
+        <select id="language" v-model="language" @change="updateLanguage">
+          <option value="it">🤌 Italiano</option>
+          <option value="en">🇬🇧 English</option>
+        </select>
+      </div>
+      <button @click="newGame">{{ labels.newGame }}</button>
+    </div>
     <div v-else>
       <div class="scores">
-        <p v-if="round < (roundTotal + 1)">Round: {{ round }}/{{roundTotal}}</p>
-        <p>Punteggio: {{ score }}</p>
+        <p v-if="round < (roundTotal + 1)">{{ labels.round }}: {{ round }}/{{roundTotal}}</p>
+        <p>{{ labels.score }}: {{ score }}</p>
       </div>
-      <p v-if="loading">🔃 Caricamento in corso...</p>
-      <img v-if="imageUrl" :src="imageUrl" alt="Immagine da Wikipedia" />
+      <p v-if="loading">🔃 {{ labels.loading }}</p>
+      <img v-if="imageUrl" :src="imageUrl" :alt="labels.imageAlt" />
       <p>{{ snippet }}</p>
       <div class="guesses" v-if="options.length && !loading && !result">
         <button v-for="option in options" :key="option" @click="checkGuess(option)">
@@ -15,9 +24,9 @@
         </button>
       </div>
       <p v-if="result">{{ result }}</p>
-      <button v-if="result && round < (roundTotal + 1)" @click="nextRound">Prossimo round</button>
-      <button v-if="round === (roundTotal + 1)" @click="newGame">Nuova partita</button>
-      <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">Mostra immagine</button>
+      <button v-if="result && round < (roundTotal + 1)" @click="nextRound">{{ labels.nextRound }}</button>
+      <button v-if="round === (roundTotal + 1)" @click="newGame">{{ labels.newGame }}</button>
+      <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ labels.showImage }}</button>
     </div>
   </div>
 </template>
@@ -40,7 +49,17 @@ export default {
       gameStarted: false,
       round: 0,
       roundTotal: 10,
-      imageShown: false
+      imageShown: false,
+      language: 'it', // Default language
+      labels: {
+        newGame: 'Nuova partita',
+        nextRound: 'Prossimo round',
+        showImage: 'Mostra immagine',
+        round: 'Round',
+        score: 'Punteggio',
+        loading: 'Caricamento in corso...',
+        imageAlt: 'Immagine da Wikipedia'
+      }
     };
   },
   methods: {
@@ -48,7 +67,7 @@ export default {
       this.loading = true;
       try {
         // Fetch a random page summary
-        const randomPageResponse = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+        const randomPageResponse = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/random/summary`);
         const randomPageData = await randomPageResponse.json();
         this.correctTitle = randomPageData.title;
         this.snippet = this.replaceTitleWords(randomPageData.extract, this.correctTitle);
@@ -56,7 +75,7 @@ export default {
         // Fetch additional random pages to replace related pages
         const randomPages = [];
         for (let i = 0; i < 3; i++) {
-          const randomPageResponse = await fetch('https://en.wikipedia.org/api/rest_v1/page/random/summary');
+          const randomPageResponse = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/random/summary`);
           const randomPageData = await randomPageResponse.json();
           randomPages.push({ title: randomPageData.title });
         }
@@ -109,7 +128,7 @@ export default {
       this.loading = true;
       try {
         this.imageShown = true;
-        const response = await fetch(`https://it.wikipedia.org/api/rest_v1/page/summary/${this.correctTitle}`);
+        const response = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/summary/${this.correctTitle}`);
         const data = await response.json();
         this.imageUrl = data.thumbnail ? data.thumbnail.source : '';
         this.score -= 500;
@@ -145,6 +164,29 @@ export default {
       this.imageShown = false;
       if (this.round < (this.roundTotal + 1)) {
         this.fetchRandomPageData();
+      }
+    },
+    updateLanguage() {
+      if (this.language === 'it') {
+        this.labels = {
+          newGame: 'Nuova partita',
+          nextRound: 'Prossimo round',
+          showImage: 'Mostra immagine',
+          round: 'Round',
+          score: 'Punteggio',
+          loading: 'Caricamento in corso...',
+          imageAlt: 'Immagine da Wikipedia'
+        };
+      } else if (this.language === 'en') {
+        this.labels = {
+          newGame: 'New Game',
+          nextRound: 'Next Round',
+          showImage: 'Show Image',
+          round: 'Round',
+          score: 'Score',
+          loading: 'Loading...',
+          imageAlt: 'Image from Wikipedia'
+        };
       }
     }
   }
