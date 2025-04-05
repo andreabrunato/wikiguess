@@ -1,75 +1,52 @@
 <template>
   <div class="the-game">
-    <div v-if="!gameStarted">
-      <div class="language-selector">
-        <label for="language">LANGUAGE:</label>
-        <select id="language" v-model="language" @change="updateLanguage">
-          <option value="it">🤌 Italiano</option>
-          <option value="en">🇬🇧 English</option>
-        </select>
-      </div>
-      <button @click="newGame">{{ t('newGame') }}</button>
-    </div>
-    <div v-else>
-      <div class="scores">
-        <p v-if="round < (roundTotal + 1)">{{ t('round') }}: {{ round }}/{{roundTotal}}</p>
-        <p>{{ t('score') }}: {{ score }}</p>
-      </div>
-      <p v-if="loading">🔃 {{ t('loading') }}</p>
-      <div v-if="gameStarted && !loading && !result && options.length">
-        <p v-if="gameStarted && !loading && !result">⏱️ {{ timer.toFixed(2) }}s</p>
-        <img v-if="imageUrl" :src="imageUrl" :alt="t('imageAlt')" />
-        <p>{{ snippet }}</p>
-        <div class="guesses">
-          <button v-for="option in options" :key="option" @click="checkGuess(option)">
-            {{ option.replace(/_/g, ' ') }}
-          </button>
-        </div>
-      </div>
-      <p v-if="result">{{ result }}</p>
-      <p v-if="result && timer > 0">⏱️ Tempo impiegato: {{ timer.toFixed(2) }}s</p>
-      <div v-if="result">
-        <p v-if="result === t('correct')">+1000 {{ t('points') }}</p>
-        <p v-if="timer <= 10 && result === t('correct')">Bonus tempo: +{{ Math.max(0, 10000 - Math.round(timer * 1000)) }}</p>
-        <p v-if="result !== t('correct')">-2000 {{ t('points') }}</p>
-      </div>
-      <button v-if="result && round < (roundTotal + 1)" @click="nextRound">{{ t('nextRound') }}</button>
-      <button v-if="round === (roundTotal + 1)" @click="newGame">{{ t('newGame') }}</button>
-      <button v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="showImage">{{ t('showImage') }}</button>
-    </div>
-    <div v-if="round === (roundTotal + 1)">
-      <h1>{{ t('finalScore') }}: {{ score }}</h1>
-      <table>
-        <thead>
-          <tr>
-            <th>{{ t('questionText') }}</th>
-            <th>{{ t('timeTaken') }}</th>
-            <th>{{ t('timeBonus') }}</th>
-            <th>{{ t('pointsEarned') }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(result, index) in results" :key="index">
-            <td>{{ result.question }}</td>
-            <td>{{ result.time.toFixed(2) }}s</td>
-            <td>{{ result.bonus }}</td>
-            <td>{{ result.points }}</td>
-          </tr>
-        </tbody>
-      </table>
-      <button @click="newGame">{{ t('newGame') }}</button>
-    </div>
+    <StartScreen
+      v-if="!gameStarted"
+      :language="language"
+      @updateLanguage="updateLanguage"
+      @startGame="newGame"
+    />
+    <GameScreen
+      v-else-if="gameStarted && round <= roundTotal"
+      :round="round"
+      :roundTotal="roundTotal"
+      :score="score"
+      :loading="loading"
+      :gameStarted="gameStarted"
+      :result="result"
+      :options="options"
+      :timer="timer"
+      :imageUrl="imageUrl"
+      :snippet="snippet"
+      :imageShown="imageShown"
+      @checkGuess="checkGuess"
+      @nextRound="nextRound"
+      @buyImage="buyImage"
+    />
+    <FinalScreen
+      v-else
+      :score="score"
+      :results="results"
+      @newGame="newGame"
+    />
   </div>
 </template>
 
 <script>
+import StartScreen from './StartScreen.vue';
+import GameScreen from './GameScreen.vue';
+import FinalScreen from './FinalScreen.vue';
 import { useI18n } from 'vue-i18n';
-import { fetchRandomPage, fetchRelatedPages, fetchRandomPagesBatch } from '../utils/api';
 
 export default {
+  components: {
+    StartScreen,
+    GameScreen,
+    FinalScreen
+  },
   setup() {
-    const { t, locale } = useI18n();
-    return { t, locale };
+    const { t } = useI18n();
+    return { t };
   },
   data() {
     return {
@@ -90,7 +67,8 @@ export default {
       timer: 0,
       timerInterval: null,
       preloadedQuestions: [], // Array per memorizzare le domande precaricate
-      results: [] // Array per memorizzare i risultati di ogni domanda
+      results: [], // Array per memorizzare i risultati di ogni domanda
+      imageLoading: false // Stato per tracciare il caricamento dell'immagine
     };
   },
   methods: {
@@ -188,6 +166,25 @@ export default {
         this.loading = false;
       }
     },
+    async buyImage() {
+      this.stopTimer(); // Ferma il timer
+      this.loading = true;
+      this.imageLoading = true;
+      const previousTime = this.timer; // Salva il tempo corrente
+      try {
+        this.imageShown = true;
+        const response = await fetch(`https://${this.language}.wikipedia.org/api/rest_v1/page/summary/${this.correctTitle}`);
+        const data = await response.json();
+        this.imageUrl = data.thumbnail ? data.thumbnail.source : '';
+        this.score -= 500;
+      } catch (error) {
+        console.error('Errore nel recupero dell\'immagine:', error);
+      } finally {
+        this.loading = false;
+        this.imageLoading = false;
+        this.startTimer(previousTime); // Riavvia il timer dal tempo precedente
+      }
+    },
     async newGame() {
       this.stopTimer();
       this.snippet = '';
@@ -270,8 +267,9 @@ export default {
     updateLanguage() {
       this.locale = this.language; // Assegna direttamente la lingua selezionata
     },
-    startTimer() {
-      this.timer = 0;
+    startTimer(initialTime = 0) {
+      if (this.imageLoading) return; // Non avvia il timer se l'immagine è in caricamento
+      this.timer = initialTime; // Imposta il tempo iniziale
       if (this.timerInterval) {
         clearInterval(this.timerInterval);
       }
@@ -288,45 +286,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-  :root {
-    --primary-color: #0070f3;
-  }
-  body {
-    padding: 20px;
-    display: flex;
-  }
-  .the-game {
-    font-family: sans-serif;
-    font-size: 2rem;
-    border: 3px solid #000;
-    border-radius: 10px;
-    padding: 20px;
-    margin: 20px;
-    max-width: 1200px;
-    margin: 40px auto;
-    text-align: center;
-  }
-  .scores {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
-    font-weight: bold;
-    font-size: 1rem;
-  }
-  button {
-    font-size: 1.2rem;
-    font-weight: bold;
-    border-radius: 50rem;
-    padding: 0.5rem 1rem;
-    background: var(--primary-color) !important;
-    margin: 0.2rem;
-  }
-  .guesses {
-    margin-bottom: 3rem;
-  }
-  .guesses button {
-    min-width: calc(50% - 0.4rem);
-  }
-</style>

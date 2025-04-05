@@ -12,5 +12,6 @@
   "questionText": "Testo della domanda",
   "timeTaken": "Tempo impiegato",
   "timeBonus": "Bonus tempo",
-  "pointsEarned": "Punti ottenuti"
+  "pointsEarned": "Punti ottenuti",
+  "buyImage": "Compra immagine per 500 punti"
 }
