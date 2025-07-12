@@ -13,13 +13,18 @@
 
     <!-- Question Section -->
     <div v-if="gameStarted && !loading && !result && options.length" class="question-section text-center space-y-4">
-      <img v-if="imageUrl" :src="imageUrl" alt="Question Image" class="rounded-lg shadow-lg" />
+      <img v-if="imageUrl" :src="imageUrl" alt="Question Image" class="rounded-lg shadow-lg mx-auto" />
       <p class="text-lg">{{ snippet }}</p>
     </div>
 
     <!-- Options Section -->
-    <div v-if="gameStarted && !loading && !result && options.length" class="options grid grid-cols-2 gap-4 w-full">
-      <button v-for="option in options" :key="option" class="btn btn-primary" @click="$emit('checkGuess', option)">
+    <div v-if="gameStarted && !loading && !result && options.length" class="options w-full grid grid-cols-1 md:grid-cols-2 gap-4">
+      <button
+        v-for="option in options"
+        :key="option"
+        class="btn btn-primary option-btn"
+        @click="$emit('checkGuess', option)"
+      >
         {{ option.replace(/_/g, ' ') }}
       </button>
     </div>
@@ -34,7 +39,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="actions flex space-x-4">
+    <div class="actions space-x-4">
       <button class="btn btn-primary" v-if="result && round < (roundTotal + 1)" @click="$emit('nextRound')">{{ t('nextRound') }}</button>
       <button class="btn btn-primary" v-if="round === (roundTotal + 1)" @click="$emit('newGame')">{{ t('newGame') }}</button>
       <button class="btn btn-success" v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="$emit('buyImage')">{{ t('buyImage') }}</button>
@@ -55,9 +60,31 @@ export default {
 </script>
 
 <style scoped>
+/* Struttura principale */
+
+/* Struttura principale */
 .game-screen {
   padding: 20px;
   max-width: 800px;
   margin: 0 auto;
+}
+
+@media (max-width: 600px) {
+  .game-screen {
+    padding: 8px;
+    max-width: 100vw;
+  }
+  .header {
+    padding: 8px;
+    font-size: 1rem;
+  }
+}
+
+.btn {
+  white-space: normal;
+  display: inline;
+  height: auto;
+  padding: 1em;
+
 }
 </style>

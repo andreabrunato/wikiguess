@@ -5,6 +5,7 @@
       :language="language"
       @updateLanguage="updateLanguage"
       @startGame="newGame"
+        :apiError="apiError"
     />
     <div v-else-if="loading" class="loading-screen flex flex-col items-center justify-center h-screen">
       <div class="loader border-t-4 border-primary rounded-full w-16 h-16 animate-spin"></div>
@@ -73,7 +74,8 @@ export default {
       timerInterval: null,
       preloadedQuestions: [], // Array per memorizzare le domande precaricate
       results: [], // Array per memorizzare i risultati di ogni domanda
-      imageLoading: false // Stato per tracciare il caricamento dell'immagine
+      imageLoading: false, // Stato per tracciare il caricamento dell'immagine
+      apiError: '' // Stato per gestire l'errore API
     };
   },
   methods: {
@@ -95,7 +97,12 @@ export default {
           options: this.options,
         };
       } catch (error) {
-        console.error('Errore nel recupero della pagina Wikipedia:', error);
+        this.apiError = this.language === 'it'
+          ? 'Le API di Wikipedia hanno avuto un problema, prova ad iniziare una nuova partita!'
+          : 'Wikipedia API had a problem, try starting a new game!';
+        this.gameStarted = false;
+        this.loading = false;
+        return;
       } finally {
         this.loading = false;
         if (this.options.length) {
@@ -208,6 +215,7 @@ export default {
       this.loading = true; // Mostra il loading finché non sono precaricate tutte le domande
       this.preloadedQuestions = []; // Array per memorizzare le domande precaricate
       this.results = []; // Resetta i risultati
+      this.apiError = '';
 
       try {
         // Precarica tutte le domande in batch
@@ -236,7 +244,12 @@ export default {
         );
 
       } catch (error) {
-        console.error('Errore durante la precarica delle domande:', error);
+        this.apiError = this.language === 'it'
+          ? 'Le API di Wikipedia hanno avuto un problema, prova ad iniziare una nuova partita!'
+          : 'Wikipedia API had a problem, try starting a new game!';
+        this.gameStarted = false;
+        this.loading = false;
+        return;
       } finally {
         this.loading = false; // Nasconde il loading una volta completata la precarica
       }

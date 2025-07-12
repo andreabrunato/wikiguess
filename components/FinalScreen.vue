@@ -32,7 +32,7 @@
 
     <!-- Leaderboard personale -->
     <div class="mt-8 w-full flex justify-center">
-      <PersonalLeaderboard :currentScore="score" />
+      <PersonalLeaderboard :currentScore="score" :leaderboard="leaderboard" />
     </div>
 
     <!-- Pulsanti -->
@@ -46,13 +46,14 @@
 <script>
 import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 export default {
   props: ['score', 'results'],
   setup(props) {
     const { t } = useI18n();
     const router = useRouter();
+    // ...structure: variabili leaderboard e isBestScore...
     const leaderboard = ref([]);
     const isBestScore = ref(false);
 
@@ -60,24 +61,30 @@ export default {
       window.location.href = '/wikiguess/';
     };
 
-    // Gestione leaderboard personale
-    onMounted(() => {
+    // Aggiorna leaderboard locale, salva su localStorage e notifica l'aggiornamento
+    const updateLeaderboard = () => {
       const key = 'wikiguess_leaderboard';
       let entries = JSON.parse(localStorage.getItem(key) || '[]');
-      // Aggiungi nuovo punteggio con data
       const now = new Date();
       const formattedDate = now.toLocaleString();
+      // Rimuovi eventuali duplicati con stesso score e data
+      entries = entries.filter(e => !(e.score === props.score && e.date === formattedDate));
       entries.push({ score: props.score, date: formattedDate });
-      // Filtra solo oggetti validi
       entries = entries.filter(e => typeof e.score === 'number' && typeof e.date === 'string');
-      // Ordina per punteggio decrescente
-      entries = entries.sort((a, b) => b.score - a.score).slice(0, 10);
-      localStorage.setItem(key, JSON.stringify(entries));
+      entries = entries.sort((a, b) => b.score - a.score).slice(0, 5);
       leaderboard.value = entries;
       isBestScore.value = entries.length > 0 && props.score === entries[0].score;
+      localStorage.setItem(key, JSON.stringify(entries));
+      // Notifica aggiornamento leaderboard
+      window.dispatchEvent(new CustomEvent('leaderboard-updated'));
+    };
+
+    onMounted(updateLeaderboard);
+    watch(() => props.score, () => {
+      updateLeaderboard();
     });
 
-    return { t, goHome, leaderboard, isBestScore };
+    return { t, goHome, isBestScore, leaderboard };
   }
 };
 </script>

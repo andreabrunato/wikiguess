@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.0] - 2025-07-12
+
+### Changed
+
+- Improved API error handling: now a clear message is shown if Wikipedia does not respond.
+- Mobile experience optimizations: better layout and responsiveness for small screens.
+
+### Fixed
+
+- Fixed leaderboard update issues.
+
 ## [1.0.0] - 2025-07-12
 
 ### Added

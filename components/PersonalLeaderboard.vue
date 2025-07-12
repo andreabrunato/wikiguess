@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 export default {
@@ -29,18 +29,26 @@ export default {
     currentScore: {
       type: Number,
       default: null
-    }
+    },
   },
   setup(props) {
     const { t } = useI18n();
     const leaderboard = ref([]);
 
-    onMounted(() => {
+    const updateLeaderboard = () => {
       const key = 'wikiguess_leaderboard';
       let entries = JSON.parse(localStorage.getItem(key) || '[]');
       entries = entries.filter(e => typeof e.score === 'number' && typeof e.date === 'string');
-      entries = entries.sort((a, b) => b.score - a.score).slice(0, 10);
+      entries = entries.sort((a, b) => b.score - a.score).slice(0, 5);
       leaderboard.value = entries;
+    };
+
+    onMounted(() => {
+      updateLeaderboard();
+      window.addEventListener('leaderboard-updated', updateLeaderboard);
+    });
+    watch(() => props.currentScore, () => {
+      updateLeaderboard();
     });
 
     return { t, leaderboard, currentScore: props.currentScore };
