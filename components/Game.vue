@@ -78,7 +78,7 @@ export default {
   },
   methods: {
     async fetchRandomPageData() {
-      const t = this.t;
+      const t = this.$t;
       this.loading = true;
       this.stopTimer(); // Stop any previous timer
       try {
@@ -128,7 +128,7 @@ export default {
       return snippet;
     },
     checkGuess(option) {
-      const t = this.t;
+      const t = this.$t;
       this.stopTimer();
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       let points = 0;
@@ -192,7 +192,7 @@ export default {
       }
     },
     async newGame() {
-      const t = this.t;
+      const t = this.$t;
       this.stopTimer();
       this.snippet = '';
       this.correctTitle = '';
