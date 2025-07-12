@@ -8,7 +8,7 @@
     />
     <div v-else-if="loading" class="loading-screen flex flex-col items-center justify-center h-screen">
       <div class="loader border-t-4 border-primary rounded-full w-16 h-16 animate-spin"></div>
-      <p class="mt-4 text-lg font-bold">{{ t('loading') }}</p>
+      <p class="mt-4 text-lg font-bold">{{ $t('loading') }}</p>
     </div>
     <GameScreen
       v-else-if="gameStarted && round <= roundTotal"
@@ -116,7 +116,6 @@ export default {
 
       this.options = this.shuffleArray(this.options);
     },
-
     shuffleArray(array) {
       return array.sort(() => Math.random() - 0.5);
     },
@@ -269,8 +268,9 @@ export default {
         this.setQuestion(this.round - 1); // Usa la domanda precaricata per il round successivo
       }
     },
-    updateLanguage() {
-      this.locale = this.language; // Assegna direttamente la lingua selezionata
+    updateLanguage(newLang) {
+      this.language = newLang;
+      this.$i18n.locale = newLang;
     },
     startTimer(initialTime = 0) {
       if (this.imageLoading) return; // Non avvia il timer se l'immagine è in caricamento

@@ -1,8 +1,13 @@
 {
+  "infoText": "<h3 class=\"text-xl font-bold mb-2\">Come funziona WikiGuess?</h3><p>Questo è un quiz in cui ogni domanda viene generata da un vero articolo di Wikipedia. Il titolo della pagina viene nascosto dal testo e il tuo obiettivo è indovinare l'articolo corretto basandoti sullo snippet e sugli indizi forniti. Puoi anche acquistare l'immagine dell'articolo con una piccola penalità di punti e rispondere velocemente ti farà guadagnare più punti!</p><h3 class=\"text-xl font-bold mt-4 mb-2\">Info sul progetto</h3><p>Sviluppato da <a href=\"https://www.linkedin.com/in/andreabrunato/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">Andrea 'Bruno' Brunato</a>, web developer, con l'aiuto di GitHub Copilot e un approccio vibe coding.<br>Codice sorgente su <a href=\"https://github.com/andreabrunato/wikiguess\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">GitHub</a>.</p><h3 class=\"text-xl font-bold mt-4 mb-2\">Tecnologie usate</h3><p>Realizzato con <span class=\"font-semibold\">Vue.js</span>, <span class=\"font-semibold\">Tailwind CSS</span>, <span class=\"font-semibold\">Nuxt</span> e <span class=\"font-semibold\">DaisyUI</span></p><h3 class=\"text-xl font-bold mt-4 mb-2\">Wikipedia API</h3><p>Questo gioco utilizza le <a href=\"https://www.mediawiki.org/wiki/API:Main_page\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">API di Wikipedia</a> per ottenere dati e immagini dagli articoli.</p><h3 class=\"text-xl font-bold mt-4 mb-2\">Licenze</h3><p>I testi degli articoli sono distribuiti con licenza <a href=\"https://creativecommons.org/licenses/by-sa/4.0/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">CC BY-SA 4.0</a>. Le immagini possono essere soggette a licenze differenti, verifica sempre la fonte su Wikipedia o Wikimedia Commons.</p>",
   "newGame": "Nuova partita",
   "loading": "Caricamento in corso...",
   "round": "Round",
   "score": "Punteggio",
+  "question": "Domanda",
+  "time": "Tempo",
+  "bonus": "Bonus",
+  "points": "Punti",
   "correct": "Corretto!",
   "wrong": "Sbagliato! La risposta corretta era: ",
   "nextRound": "Prossimo round",
@@ -15,5 +20,8 @@
   "pointsEarned": "Punti ottenuti",
   "buyImage": "Compra immagine per 500 punti",
   "gameOver": "Fine del gioco",
-  "playAgain": "Gioca di nuovo"
+  "playAgain": "Gioca di nuovo",
+  "backHome": "Torna alla homepage",
+  "personalLeaderboard": "I tuoi migliori punteggi",
+  "date": "Data e ora"
 }
