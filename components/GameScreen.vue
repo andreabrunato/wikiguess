@@ -37,7 +37,7 @@
     <div class="actions flex space-x-4">
       <button class="btn btn-primary" v-if="result && round < (roundTotal + 1)" @click="$emit('nextRound')">{{ t('nextRound') }}</button>
       <button class="btn btn-primary" v-if="round === (roundTotal + 1)" @click="$emit('newGame')">{{ t('newGame') }}</button>
-      <button class="btn btn-success" v-if="!result && round < (roundTotal + 1) && !loading && !imageShown && timer >= 5" @click="$emit('buyImage')">{{ t('buyImage') }}</button>
+      <button class="btn btn-success" v-if="!result && round < (roundTotal + 1) && !loading && !imageShown" @click="$emit('buyImage')">{{ t('buyImage') }}</button>
     </div>
   </div>
 </template>

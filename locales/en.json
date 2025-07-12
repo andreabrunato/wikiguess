@@ -1,4 +1,5 @@
 {
+  "infoText": "<strong>How does WikiGuess work?</strong><br>This is a quiz game where each question is generated from a real Wikipedia article. The title of the page is hidden from the text, and your goal is to guess the correct article based on the snippet and clues provided. You can also buy the article's image for a small point penalty, and answering quickly will earn you more points!<br><br><strong>About the project</strong><br>Developed by <a href=\"https://www.linkedin.com/in/andreabrunato/\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">Andrea 'Bruno' Brunato</a>, web developer, with the help of GitHub Copilot and a vibe coding approach.<br>Source code available on <a href=\"https://github.com/andreabrunato/wikiguess\" target=\"_blank\" rel=\"noopener\" class=\"underline hover:text-primary\">GitHub</a>.<br><br><strong>Technologies used</strong><br>Built with <span class=\"font-semibold\">Vue.js</span>, <span class=\"font-semibold\">Tailwind CSS</span>, <span class=\"font-semibold\">Nuxt</span>, and <span class=\"font-semibold\">DaisyUI</span>",
   "newGame": "New Game",
   "loading": "Loading...",
   "round": "Round",
@@ -15,5 +16,6 @@
   "pointsEarned": "Points Earned",
   "buyImage": "Buy Image for 500 points",
   "gameOver": "Game Over",
-  "playAgain": "Play Again"
+  "playAgain": "Play Again",
+  "backHome": "Back to homepage"
 }

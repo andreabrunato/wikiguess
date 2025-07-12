@@ -30,21 +30,23 @@
     </div>
 
     <button class="btn btn-primary" @click="$emit('restartGame')">{{ t('playAgain') }}</button>
+    <button class="btn btn-secondary" @click="goHome">{{ t('backHome') }}</button>
   </div>
 </template>
 
 <script>
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 
 export default {
   props: ['score', 'results'],
   setup() {
     const { t } = useI18n();
-    return { t };
+    const router = useRouter();
+    const goHome = () => {
+      window.location.href = '/wikiguess/';
+    };
+    return { t, goHome };
   }
 };
 </script>
-
-<style scoped>
-/* Rimosso il CSS non necessario, ora utilizza solo classi di daisyUI */
-</style>
