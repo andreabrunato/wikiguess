@@ -30,5 +30,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .output/public
-          # Se usi Nuxt 2, cambia publish_dir in dist
+          publish_dir: .output/dist
