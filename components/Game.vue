@@ -78,6 +78,7 @@ export default {
   },
   methods: {
     async fetchRandomPageData() {
+      const t = this.t;
       this.loading = true;
       this.stopTimer(); // Stop any previous timer
       try {
@@ -86,7 +87,7 @@ export default {
         this.snippet = this.replaceTitleWords(randomPageData.extract, this.correctTitle);
 
         this.relatedPages = await fetchRelatedPages(this.language);
-        this.createOptions();
+        this.createOptions(t);
         return {
           correctTitle: this.correctTitle,
           snippet: this.snippet,
@@ -102,7 +103,7 @@ export default {
         }
       }
     },
-    createOptions() {
+    createOptions(t) {
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       const relatedTitles = this.relatedPages
         .map(page => page.title?.replace(/\s*\([^)]*\)/g, '') || '')
@@ -111,7 +112,7 @@ export default {
       this.options = [sanitizedCorrectTitle, ...relatedTitles];
 
       while (this.options.length < 4) {
-        this.options.push(this.t('randomAnswer') + ` ${this.options.length + 1}`);
+        this.options.push(t('randomAnswer') + ` ${this.options.length + 1}`);
       }
 
       this.options = this.shuffleArray(this.options);
@@ -127,13 +128,14 @@ export default {
       return snippet;
     },
     checkGuess(option) {
+      const t = this.t;
       this.stopTimer();
       const sanitizedCorrectTitle = this.correctTitle.replace(/\s*\([^)]*\)/g, '');
       let points = 0;
       let bonus = 0;
 
       if (option === sanitizedCorrectTitle) {
-        this.result = this.t('correct');
+        this.result = t('correct');
         points = 1000;
 
         // Calcolo del bonus se la risposta è entro 10 secondi
@@ -142,7 +144,7 @@ export default {
           points += bonus;
         }
       } else {
-        this.result = `${this.t('wrong')} ${this.correctTitle}`;
+        this.result = `${t('wrong')} ${this.correctTitle}`;
         points = -2000;
       }
 
@@ -190,6 +192,7 @@ export default {
       }
     },
     async newGame() {
+      const t = this.t;
       this.stopTimer();
       this.snippet = '';
       this.correctTitle = '';
@@ -220,7 +223,7 @@ export default {
             const options = [sanitizedCorrectTitle, ...relatedTitles];
 
             while (options.length < 4) {
-              options.push(this.t('randomAnswer') + ` ${options.length + 1}`);
+              options.push(t('randomAnswer') + ` ${options.length + 1}`);
             }
 
             return {
@@ -270,7 +273,9 @@ export default {
     },
     updateLanguage(newLang) {
       this.language = newLang;
-      this.$i18n.locale = newLang;
+      if (this.$i18n) {
+        this.$i18n.locale = newLang;
+      }
     },
     startTimer(initialTime = 0) {
       if (this.imageLoading) return; // Non avvia il timer se l'immagine è in caricamento
