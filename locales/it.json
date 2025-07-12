@@ -4,6 +4,10 @@
   "loading": "Caricamento in corso...",
   "round": "Round",
   "score": "Punteggio",
+  "question": "Domanda",
+  "time": "Tempo",
+  "bonus": "Bonus",
+  "points": "Punti",
   "correct": "Corretto!",
   "wrong": "Sbagliato! La risposta corretta era: ",
   "nextRound": "Prossimo round",
@@ -17,5 +21,7 @@
   "buyImage": "Compra immagine per 500 punti",
   "gameOver": "Fine del gioco",
   "playAgain": "Gioca di nuovo",
-  "backHome": "Torna alla homepage"
+  "backHome": "Torna alla homepage",
+  "personalLeaderboard": "I tuoi migliori punteggi",
+  "date": "Data e ora"
 }
