@@ -8,7 +8,7 @@
     />
     <div v-else-if="loading" class="loading-screen flex flex-col items-center justify-center h-screen">
       <div class="loader border-t-4 border-primary rounded-full w-16 h-16 animate-spin"></div>
-      <p class="mt-4 text-lg font-bold">{{ $t('loading') }}</p>
+      <p class="mt-4 text-lg font-bold">{{ t('loading') }}</p>
     </div>
     <GameScreen
       v-else-if="gameStarted && round <= roundTotal"
