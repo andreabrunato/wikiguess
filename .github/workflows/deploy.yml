@@ -1,0 +1,40 @@
+# Workflow per deploy automatico su GitHub Pages con Nuxt 3
+# Salva questo file come .github/workflows/deploy.yml
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout del codice
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Installazione dipendenze
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Build statico Nuxt
+      - name: Generate static site
+        run: yarn generate
+
+      # Deploy su GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
